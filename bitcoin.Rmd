@@ -11,7 +11,7 @@ library(tidyverse)
 ```
 
 ```{r}
-df = read_csv('/Users/g/Desktop/country_power_usage.csv')
+df = read_csv('country_power_usage.csv')
 
 btc_qbtu = 73/293
 
