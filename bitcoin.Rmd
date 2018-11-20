@@ -1,0 +1,68 @@
+---
+title: "bitcoin_energy"
+author: "George Berry"
+date: "11/19/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+```{r}
+df = read_csv('/Users/g/Desktop/country_power_usage.csv')
+
+btc_qbtu = 73/293
+
+df$less_than_btc = df$consumption < btc_qbtu
+
+world = map_data('world') %>%
+  filter(region != 'Antarctica') %>%
+  left_join(df, by=c('region' = 'country'))
+
+lt_df = world %>%
+  group_by(region) %>%
+  summarize(less_than_btc = mean(less_than_btc))
+
+print(sum(lt_df$less_than_btc, na.rm=T))
+```
+
+```{r}
+ggplot() + geom_polygon(data = world, aes(x=long, y = lat, fill=consumption, group = group)) + 
+  coord_fixed(1.3) +
+  guides(fill=FALSE)
+```
+
+
+```{r}
+
+p1 = ggplot() + geom_polygon(data = world, aes(x=long, y = lat, fill=as.integer(production < 73/293), group = group)) + 
+  coord_fixed(1.3) +
+  guides(fill=FALSE) +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    panel.background = element_blank(),
+    axis.title.x=element_blank(),
+    axis.text.x=element_blank(),
+    axis.ticks.x=element_blank(),
+    axis.title.y=element_blank(),
+    axis.text.y=element_blank(),
+    axis.ticks.y=element_blank()
+  ) +
+  labs(title='Countries with total energy consumption less than Bitcoin mining')
+```
+
+
+```{r}
+btc_market_cap = 80881394132
+btc_twh = 73
+btc_dollars_per_twh = btc_market_cap / btc_twh
+
+total_assets_us = 123800000000000
+us_twh = 82 * 293
+us_dollars_per_twh = total_assets_us / us_twh
+```
